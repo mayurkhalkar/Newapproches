@@ -1,0 +1,9 @@
+from pyspark.sql import SparkSession
+
+# Initialize SparkSession
+spark = SparkSession.builder \
+    .appName("DataFrame to Avro") \
+    .getOrCreate()
+
+# Convert DataFrame to Avro format and write to file
+df.write.format("avro").save("data.avro")
