@@ -1,0 +1,170 @@
+
+Using pandas and avro-python3 library:
+python
+Copy code
+import pandas as pd
+import avro
+from avro.datafile import DataFileWriter
+from avro.io import DatumWriter
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+df.to_csv(buffer)
+avro_schema = avro.schema.make_avsc_object(df.columns.tolist(), avro.schema.Names())
+writer = DataFileWriter(buffer, DatumWriter(), avro_schema)
+for row in df.to_dict(orient='records'):
+    writer.append(row)
+writer.close()
+Using pyspark and avro-python3 library:
+python
+Copy code
+from pyspark.sql import SparkSession
+import avro
+from avro.datafile import DataFileWriter
+from avro.io import DatumWriter
+from io import BytesIO
+
+spark = SparkSession.builder.appName("JsonToAvro").getOrCreate()
+df = spark.read.json("your_json_file.json")
+buffer = BytesIO()
+df.write.csv(buffer)
+avro_schema = avro.schema.make_avsc_object(df.columns, avro.schema.Names())
+writer = DataFileWriter(buffer, DatumWriter(), avro_schema)
+for row in df.collect():
+    writer.append(row.asDict())
+writer.close()
+Using pandas, fastavro, and json library:
+python
+Copy code
+import pandas as pd
+import json
+import fastavro
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+df.to_csv(buffer)
+buffer.seek(0)
+data = [{k: str(v) for k, v in row.items()} for row in df.to_dict(orient='records')]
+avro_schema = fastavro.parse_schema(fastavro.json_schema(data))
+fastavro.writer(buffer, avro_schema, data)
+Using pandas, avro-python3, and json library:
+python
+Copy code
+import pandas as pd
+import json
+from avro import schema, datafile, io
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+df.to_csv(buffer)
+buffer.seek(0)
+avro_schema = schema.Parse(json.dumps({'type': 'record', 'name': 'Example', 'fields': [{'name': c, 'type': 'string'} for c in df.columns]}))
+writer = datafile.DataFileWriter(buffer, io.DatumWriter(), avro_schema)
+for row in df.to_dict(orient='records'):
+    writer.append(row)
+writer.close()
+Using pyspark and fastavro:
+python
+Copy code
+from pyspark.sql import SparkSession
+import fastavro
+from io import BytesIO
+
+spark = SparkSession.builder.appName("JsonToAvro").getOrCreate()
+df = spark.read.json("your_json_file.json")
+buffer = BytesIO()
+df.write.csv(buffer)
+buffer.seek(0)
+schema = fastavro.parse_schema(json.dumps({"type": "record", "name": "example", "fields": [{"name": c, "type": "string"} for c in df.columns]}))
+with open("output.avro", "wb") as out:
+    fastavro.writer(out, schema, csv.DictReader(buffer))
+Using pandas and avro-python3 with dynamic schema generation:
+python
+Copy code
+import pandas as pd
+from avro import schema, datafile, io
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+df.to_csv(buffer)
+buffer.seek(0)
+avro_schema = schema.make_avsc_object(df.columns.tolist(), schema.Names())
+writer = datafile.DataFileWriter(buffer, io.DatumWriter(), avro_schema)
+for row in df.to_dict(orient='records'):
+    writer.append(row)
+writer.close()
+Using pandas and fastavro with dynamic schema generation:
+python
+Copy code
+import pandas as pd
+import fastavro
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+df.to_csv(buffer)
+buffer.seek(0)
+avro_schema = fastavro.parse_schema(fastavro.json_schema([{k: str(v) for k, v in row.items()} for row in df.to_dict(orient='records')]))
+fastavro.writer(buffer, avro_schema, [{k: str(v) for k, v in row.items()} for row in df.to_dict(orient='records')])
+Using pandas and avro-python3 with dynamic schema generation and direct conversion from JSON:
+python
+Copy code
+import pandas as pd
+import json
+from avro import schema, datafile, io
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+avro_schema = schema.make_avsc_object(df.columns.tolist(), schema.Names())
+buffer = BytesIO()
+writer = datafile.DataFileWriter(buffer, io.DatumWriter(), avro_schema)
+for index, row in df.iterrows():
+    writer.append(json.loads(row.to_json()))
+writer.close()
+Using pyspark and fastavro with dynamic schema generation:
+python
+Copy code
+from pyspark.sql import SparkSession
+import fastavro
+import json
+from io import BytesIO
+
+spark = SparkSession.builder.appName("JsonToAvro").getOrCreate()
+df = spark.read.json("your_json_file.json")
+buffer = BytesIO()
+df.write.csv(buffer)
+buffer.seek(0)
+avro_schema = fastavro.parse_schema(fastavro.json_schema([{"name": c, "type": "string"} for c in df.columns]))
+with open("output.avro", "wb") as out:
+    fastavro.writer(out, avro_schema, csv.DictReader(buffer))
+Using pandas and fastavro with dynamic schema generation and direct conversion from JSON:
+python
+Copy code
+import pandas as pd
+import fastavro
+from io import BytesIO
+
+# Assuming 'json_data' is your JSON data
+df = pd.DataFrame.from_dict(json_data)
+buffer = BytesIO()
+avro_schema = fastavro.parse_schema(fastavro.json_schema([{k: str(v) for k, v in row.items()} for row in df.to_dict(orient='records')]))
+with open("output.avro", "wb") as out:
+    fastavro.writer(out, avro_schema, [{k: str(v) for k, v in row.items()} for row in df.to_dict(orient='records')])
+Choose the one that best fits your requirements and environment. Make sure to install necessary dependencies before running the code.
+
+
+
+
+
+
+Message ChatGPT…
