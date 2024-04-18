@@ -1,0 +1,71 @@
+import json
+import ast
+import re
+import yaml
+from configparser import ConfigParser
+import xmltodict
+
+# Method 1: Using the eval() function
+my_string_1 = "{'key': 'value'}"
+my_dict_1 = eval(my_string_1)
+
+# Method 2: Using the json.loads() function
+my_string_2 = '{"key": "value"}'
+my_dict_2 = json.loads(my_string_2)
+
+# Method 3: Using the ast.literal_eval() function
+my_string_3 = "{'key': 'value'}"
+my_dict_3 = ast.literal_eval(my_string_3)
+
+# Method 4: Using a dictionary comprehension with split()
+my_string_4 = "key:value"
+my_dict_4 = {k: v for k, v in (item.split(":") for item in my_string_4.split(","))}
+
+# Method 5: Using the yaml.safe_load() function
+my_string_5 = "key: value"
+my_dict_5 = yaml.safe_load(my_string_5)
+
+# Method 6: Using regular expressions
+my_string_6 = "{'key': 'value'}"
+my_dict_6 = dict(re.findall(r"'(\w+)': '(\w+)'", my_string_6))
+
+# Method 7: Using the configparser module
+my_string_7 = "[section]\nkey = value"
+config = ConfigParser()
+config.read_string(my_string_7)
+my_dict_7 = dict(config['section'])
+
+# Method 8: Using the xmltodict library
+my_string_8 = "<root><key>value</key></root>"
+my_dict_8 = xmltodict.parse(my_string_8)
+
+# Method 9: Using a loop and string manipulation
+my_string_9 = "key:value, another_key:another_value"
+my_dict_9 = {}
+for pair in my_string_9.split(","):
+    key, value = pair.split(":")
+    my_dict_9[key.strip()] = value.strip()
+
+# Method 10: Using a custom parsing function
+def parse_string_to_dict(s):
+    pairs = s.split(",")
+    d = {}
+    for pair in pairs:
+        key, value = pair.split(":")
+        d[key.strip()] = value.strip()
+    return d
+
+my_string_10 = "key:value, another_key:another_value"
+my_dict_10 = parse_string_to_dict(my_string_10)
+
+# Additional simple methods
+my_string_11 = "key:value, another_key:another_value"
+my_dict_11 = dict(item.split(":") for item in my_string_11.split(","))
+my_dict_12 = dict(part.split(":") for part in my_string_11.split(", "))
+my_dict_13 = {}
+for pair in my_string_11.split(", "):
+    key, value = pair.split(":")
+    my_dict_13[key] = value
+my_dict_14 = dict(re.split(r'[:,]', pair) for pair in my_string_11.split(", "))
+
+print(my_dict_1, my_dict_2, my_dict_3, my_dict_4, my_dict_5, my_dict_6, my_dict_7, my_dict_8, my_dict_9, my_dict_10, my_dict_11, my_dict_12, my_dict_13, my_dict_14)
