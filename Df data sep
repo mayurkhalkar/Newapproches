@@ -31,3 +31,13 @@ for df in dfs:
     start_index += len_df
 
 # Now data_from_dfs contains data from each original DataFrame separately
+
+
+
+import pandas as pd
+
+# Assuming df is your DataFrame
+json_str = df.to_json(orient='records')
+
+# If you want to convert the JSON string back to a dictionary, you can use:
+json_dict = pd.read_json(json_str, orient='records')
