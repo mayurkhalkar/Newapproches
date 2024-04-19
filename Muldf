@@ -1,0 +1,24 @@
+import pandas as pd
+
+# List of DataFrames to be appended
+dfs = [df1, df2, df3]  # Add all your DataFrames to this list
+
+# Append all DataFrames
+appended_df = pd.concat(dfs)
+
+# Initialize a list to store data from each original DataFrame
+data_from_dfs = []
+
+# Iterate over each DataFrame to retrieve data
+start_index = 0
+for df in dfs:
+    # Calculate the length of the current DataFrame
+    len_df = len(df)
+    
+    # Slice the appended DataFrame to retrieve data from the current DataFrame
+    data_from_dfs.append(appended_df.iloc[start_index:start_index + len_df])
+    
+    # Update the start index for the next DataFrame
+    start_index += len_df
+
+# Now data_from_dfs contains data from each original DataFrame separately
